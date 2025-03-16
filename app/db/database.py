@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
 
 # Construcción de la URL de conexión a la base de datos
@@ -22,3 +22,12 @@ def test_db_connection():
 
 # Llamar a la función de prueba de conexión al iniciar la aplicación
 test_db_connection()
+
+# Dependencia para obtener una sesión de base de datos
+def get_db() -> Session:
+    """Dependencia para obtener una sesión de base de datos."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
