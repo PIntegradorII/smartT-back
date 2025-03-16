@@ -1,0 +1,28 @@
+# Bytecode de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+env/
+*.env
+
+# Configuración de IDEs
+.vscode/
+.idea/
+*.swp
+
+# Dependencias instaladas
+*.log
+pip-log.txt
+
+# Archivos de Docker
+*.dockerignore
+
+# Archivos de base de datos locales
+*.sqlite3
+
+# Archivo específico a ignorar
+structure-project.py
