@@ -1,8 +1,22 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import auth, users, routines, health, exercises
 from app.core.config import settings
+from app.db.database import test_db_connection
 
 app = FastAPI(debug=settings.DEBUG)
+
+test_db_connection()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Puedes restringir a dominios específicos en producción
+    #allow_origins=["https://mi-sitio.com", "https://admin.mi-sitio.com"]es mejor especificar los dominios permitidos
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos: GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],  # Permite todos los encabezados
+)
 
 # Endpoint raíz para evitar el error 404
 @app.get("/")

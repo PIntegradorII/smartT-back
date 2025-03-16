@@ -11,3 +11,14 @@ SQLALCHEMY_DATABASE_URL = (
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+# Función para verificar la conexión a la base de datos
+def test_db_connection():
+    try:
+        with engine.connect() as connection:
+            print("✅ Conexión a la base de datos establecida correctamente.")
+    except Exception as e:
+        print(f"❌ Error al conectar con la base de datos: {e}")
+
+# Llamar a la función de prueba de conexión al iniciar la aplicación
+test_db_connection()
