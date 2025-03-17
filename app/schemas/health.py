@@ -4,21 +4,19 @@ from typing import Optional
 class HealthDataBase(BaseModel):
     id: int
     user_id: int
-    tiene_condiciones: bool
+    tiene_condiciones: str
     detalles_condiciones: Optional[str] = None
-    lesiones: bool
-    detalles_lesiones: Optional[str] = None
-    confirmacion: bool
+    lesiones: Optional[str] = None  # Ahora puede ser None
+    confirmacion: str
 
 class HealthDataCreate(HealthDataBase):
     pass
 
 class HealthDataUpdate(BaseModel):
-    tiene_condiciones: Optional[bool] = None
+    tiene_condiciones: Optional[str] = None
     detalles_condiciones: Optional[str] = None
-    lesiones: Optional[bool] = None
-    detalles_lesiones: Optional[str] = None
-    confirmacion: Optional[bool] = None
+    lesiones: Optional[str] = None
+    confirmacion: Optional[str] = None
 
 class HealthDataResponse(HealthDataBase):
     id: int

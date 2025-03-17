@@ -11,8 +11,7 @@ test_db_connection()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Puedes restringir a dominios específicos en producción
-    #allow_origins=["https://mi-sitio.com", "https://admin.mi-sitio.com"]es mejor especificar los dominios permitidos
+    allow_origins=["*", "http://localhost:3000"],  # Combina los orígenes aquí
     allow_credentials=True,
     allow_methods=["*"],  # Permite todos los métodos: GET, POST, PUT, DELETE, etc.
     allow_headers=["*"],  # Permite todos los encabezados

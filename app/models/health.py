@@ -8,11 +8,10 @@ class HealthData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    tiene_condiciones = Column(Boolean, nullable=False)
+    tiene_condiciones = Column(String, nullable=False)
     detalles_condiciones = Column(Text, nullable=True)
-    lesiones = Column(Boolean, nullable=False)
-    detalles_lesiones = Column(Text, nullable=True)
-    confirmacion = Column(Boolean, nullable=False)
+    lesiones = Column(String, nullable=True)
+    confirmacion = Column(String, nullable=False)
 
     # Relación opcional
     user = relationship("User", back_populates="health_data")
