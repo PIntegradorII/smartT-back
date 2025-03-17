@@ -8,3 +8,4 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     health_data = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
+    personal_data = relationship("PersonalData", back_populates="user", cascade="all, delete-orphan")
