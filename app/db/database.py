@@ -1,15 +1,26 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.core.config import settings
+import os
+from dotenv import load_dotenv
 
-# Construcción de la URL de conexión a la base de datos
-SQLALCHEMY_DATABASE_URL = (
-    f"mysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
-)
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Obtener la URL de conexión a la base de datos desde la variable de entorno
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Verificar que la variable de entorno DATABASE_URL esté definida
+if not DATABASE_URL:
+    raise ValueError("Falta la variable de entorno DATABASE_URL en el archivo .env.")
+
+# Crear el motor de la base de datos con la URL proporcionada
+engine = create_engine(DATABASE_URL)
+
+# Crear la sesión local para interactuar con la base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Crear la base declarativa para definir los modelos
 Base = declarative_base()
 
 # Función para verificar la conexión a la base de datos
