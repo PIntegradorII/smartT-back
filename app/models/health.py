@@ -16,3 +16,4 @@ class HealthData(Base):
 
     # Relación opcional
     user = relationship("User", back_populates="health_data")
+from app.models.user import User

@@ -6,14 +6,14 @@ from app.schemas.health import HealthDataCreate, HealthDataUpdate, HealthDataRes
 
 router = APIRouter()
 
-# Obtener todos los historiales médicos
-@router.get('/health', response_model=list[HealthDataResponse])
+#Obtener todos los historiales médicos
+@router.get('/', response_model=list[HealthDataResponse])
 def get_health_data(db: Session = Depends(get_db)):
     health_data = db.query(HealthData).all()
     return health_data
 
 # Obtener un historial médico específico por ID
-@router.get('/health/{health_id}', response_model=HealthDataResponse)
+@router.get('/{health_id}', response_model=HealthDataResponse)
 def get_health_by_id(health_id: int, db: Session = Depends(get_db)):
     health = db.query(HealthData).filter(HealthData.id == health_id).first()
     if not health:
@@ -21,7 +21,7 @@ def get_health_by_id(health_id: int, db: Session = Depends(get_db)):
     return health
 
 # Crear un nuevo historial médico
-@router.post('/health', response_model=HealthDataResponse)
+@router.post('/', response_model=HealthDataResponse)
 def create_health_data(data: HealthDataCreate, db: Session = Depends(get_db)):
     new_health_data = HealthData(**data.dict())
     db.add(new_health_data)
@@ -30,7 +30,7 @@ def create_health_data(data: HealthDataCreate, db: Session = Depends(get_db)):
     return new_health_data
 
 # Actualizar un historial médico existente
-@router.put('/health/{health_id}', response_model=HealthDataResponse)
+@router.put('/update/{health_id}', response_model=HealthDataResponse)
 def update_health_data(health_id: int, data: HealthDataUpdate, db: Session = Depends(get_db)):
     health = db.query(HealthData).filter(HealthData.id == health_id).first()
     if not health:
@@ -42,7 +42,7 @@ def update_health_data(health_id: int, data: HealthDataUpdate, db: Session = Dep
     return health
 
 # Eliminar un historial médico
-@router.delete('/health/{health_id}')
+@router.delete('/delete/{health_id}')
 def delete_health_data(health_id: int, db: Session = Depends(get_db)):
     health = db.query(HealthData).filter(HealthData.id == health_id).first()
     if not health:
@@ -50,3 +50,4 @@ def delete_health_data(health_id: int, db: Session = Depends(get_db)):
     db.delete(health)
     db.commit()
     return {"message": "Health data deleted successfully"}
+

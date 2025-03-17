@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class HealthDataBase(BaseModel):
+    id: int
     user_id: int
     tiene_condiciones: bool
     detalles_condiciones: Optional[str] = None
