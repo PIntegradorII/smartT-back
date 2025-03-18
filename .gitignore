@@ -26,3 +26,4 @@ pip-log.txt
 
 # Archivo específico a ignorar
 structure-project.py
+.qodo
