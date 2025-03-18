@@ -43,7 +43,7 @@ pip y venv para manejar dependencias
 
 3️⃣ Instalar dependencias
     pip install -r requirements.txt
-
+    pip freeze > requirements.txt
 4️⃣ Configurar las variables de entorno - Crea un archivo .env en la raíz del proyecto con la siguiente estructura:
     DATABASE_URL=mysql+pymysql://usuario:password@host:puerto/nombre_bd
     SECRET_KEY=tu_clave_secreta

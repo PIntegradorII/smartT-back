@@ -3,6 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
+from sqlalchemy.orm import sessionmaker, Session
+from app.core.config import settings
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
@@ -33,3 +35,12 @@ def test_db_connection():
 
 # Llamar a la función de prueba de conexión al iniciar la aplicación
 test_db_connection()
+
+# Dependencia para obtener una sesión de base de datos
+def get_db() -> Session:
+    """Dependencia para obtener una sesión de base de datos."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

@@ -1,7 +1,7 @@
 # main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, users, routines, health, exercises
+from app.api.v1 import auth, users, routines, health, exercises, personal_data
 from app.core.config import settings
 from app.db.database import test_db_connection
 import logging
@@ -16,7 +16,7 @@ test_db_connection()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Combina los orígenes aquí
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,3 +44,4 @@ app.include_router(users.router, prefix="/v1/users", tags=["Users"])
 app.include_router(routines.router, prefix="/v1/routines", tags=["Routines"])
 app.include_router(health.router, prefix="/v1/health", tags=["Health"])
 app.include_router(exercises.router, prefix="/v1/exercises", tags=["Exercises"])
+app.include_router(personal_data.router, prefix="/v1/personal_data", tags=["PersonalData"])
