@@ -12,6 +12,10 @@ firebase_cred_path = os.getenv("FIREBASE_ADMIN_SDK_JSON_PATH")
 if not firebase_cred_path:
     raise ValueError("La ruta del archivo de credenciales de Firebase no está definida.")
 
+if not firebase_admin._apps:
+    cred = credentials.Certificate(os.getenv("FIREBASE_ADMIN_SDK_JSON_PATH"))
+    firebase_admin.initialize_app(cred)
+
 cred = credentials.Certificate(firebase_cred_path)
 firebase_admin.initialize_app(cred)
 
