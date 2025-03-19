@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 # Esquema base para la entrada y validación de datos
 class PersonalDataBase(BaseModel):

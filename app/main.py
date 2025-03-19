@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import auth, users, routines, health, exercises, personal_data
 from app.core.config import settings
 from app.db.database import test_db_connection
-import logging
 
 
 # Crear la instancia de FastAPI

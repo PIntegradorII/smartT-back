@@ -8,6 +8,7 @@ from app.services.token_service import get_token_by_value
 from firebase_admin import credentials, auth
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 from app.db.database import SessionLocal
 from app.models.user import User
 from app.core.config import settings
@@ -57,7 +58,7 @@ def get_db():
 def verify_firebase_token(token: str):
     try:
         # Verificar el token de Firebase con el argumento correcto
-        decoded_token = auth.verify_id_token(token, clock_skew_seconds=60)
+        decoded_token = auth.verify_id_token(token, clock_skew_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         return decoded_token
     except auth.InvalidIdTokenError as e:
         raise HTTPException(status_code=400, detail=f"Token de Firebase inválido: {e}")
@@ -76,10 +77,12 @@ def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
 
         # Obtener la ruta del usuario desde la base de datos
         ruta = db.execute(
-            "SELECT COUNT(u.id) as ruta FROM personal_data pd "
-            "INNER JOIN users u ON pd.user_id = u.id WHERE u.google_id = :google_id",
-            {"google_id": google_id}
-        ).scalar()  # `scalar()` obtiene un solo valor
+                text(
+                    "SELECT COUNT(u.id) as ruta FROM personal_data pd "
+                    "INNER JOIN users u ON pd.user_id = u.id WHERE u.google_id = :google_id"
+                ),
+                {"google_id": google_id}
+            ).scalar()
 
         # Generación de JWT
         jwt_payload = {
@@ -92,8 +95,8 @@ def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
         save_token(db, user.id, jwt_token)
         
         return {
-            "access_token": jwt_token,
-            "token_type": "bearer",
+            "access_tokenc": jwt_token,
+            "token_typec": "bearer",
             "ruta": ruta  # Agregamos la ruta en la respuesta
         }
     

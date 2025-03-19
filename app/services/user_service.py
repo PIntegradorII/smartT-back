@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.db.database import SessionLocal
 from app.models.user import User
-from app.schemas.user import UserCreate
 from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+import datetime
 
 class TokenCreate(BaseModel):
     user_id: int

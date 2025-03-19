@@ -1,13 +1,10 @@
 # auth_service.py
 
 from sqlalchemy.orm import Session
-from app.db.database import SessionLocal
 from app.models.user import User
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from app.core.config import settings
-import jwt
-import datetime
 import logging
 
 logger = logging.getLogger(__name__)

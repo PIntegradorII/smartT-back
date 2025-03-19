@@ -1,6 +1,5 @@
 from app.models.token import Token
 from sqlalchemy.orm import Session
-import datetime
 
 def save_token(db: Session, user_id: int, token: str, expires_at=None):
     new_token = Token(
