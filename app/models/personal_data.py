@@ -10,7 +10,6 @@ class PersonalData(Base):
     nombre = Column(String, nullable=False)
     edad = Column(Integer, nullable=False)
     genero = Column(String, nullable=False)
-    correo = Column(String, unique=True, nullable=False)
 
     user = relationship("User", back_populates="personal_data")
 from app.models.user import User

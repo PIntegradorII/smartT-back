@@ -6,7 +6,6 @@ class PersonalDataBase(BaseModel):
     nombre: str
     edad: int
     genero: str
-    correo: EmailStr
 
 # Esquema para la creación de datos
 class PersonalDataCreate(PersonalDataBase):
