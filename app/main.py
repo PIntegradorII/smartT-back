@@ -1,7 +1,7 @@
 # main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, users, routines, health, exercises, personal_data
+from app.api.v1 import auth, users, routines, health, exercises, personal_data, training
 from app.core.config import settings
 from app.db.database import test_db_connection
 
@@ -44,3 +44,4 @@ app.include_router(routines.router, prefix="/v1/routines", tags=["Routines"])
 app.include_router(health.router, prefix="/v1/health", tags=["Health"])
 app.include_router(exercises.router, prefix="/v1/exercises", tags=["Exercises"])
 app.include_router(personal_data.router, prefix="/v1/personal_data", tags=["PersonalData"])
+app.include_router(training.router, prefix="/v1/training", tags=["Training"])
