@@ -12,14 +12,14 @@ api_key = os.getenv("TOGETHER_API_KEY")
 client = Together(api_key=api_key)
 
 # Datos estáticos del usuario (serán extraídos de la BD en el futuro)
-USER_DATA = {
-    "nombre": "Juan Pérez",
-    "peso": 75,  # kg
-    "altura": 1.75,  # m
-    "sexo": "Masculino",
-    "condiciones_medicas": ["Ninguna"],
-    "meta_entrenamiento": "Aumentar masa muscular"
-}
+# USER_DATA = {
+#     "nombre": "Juan Pérez",
+#     "peso": 75,  # kg
+#     "altura": 1.75,  # m
+#     "sexo": "Masculino",
+#     "condiciones_medicas": ["Ninguna"],
+#     "meta_entrenamiento": "Aumentar masa muscular"
+# }
 
 # Plantilla de entrenamiento en JSON
 JSON_TEMPLATE = {
@@ -73,7 +73,7 @@ def extraer_json(texto):
         print("No se encontró JSON en el texto.")
         return None
 
-def generar_plan_entrenamiento():
-    """ Genera el plan de entrenamiento basado en los datos del usuario """
-    respuesta_ia = chat_with_model(USER_DATA)
+def generar_plan_entrenamiento(user_data):
+    """ Genera el plan de entrenamiento basado en los datos proporcionados por el usuario """
+    respuesta_ia = chat_with_model(user_data)
     return extraer_json(respuesta_ia)

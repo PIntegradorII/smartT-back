@@ -51,3 +51,10 @@ def delete_health_data(health_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Health data deleted successfully"}
 
+
+@router.get('/health/user/{user_id}')
+def get_health_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    health_data = db.query(HealthData).filter(HealthData.user_id == user_id).first()
+    if not health_data:
+        raise HTTPException(status_code=404, detail="Datos de salud no encontrados")
+    return health_data

@@ -51,3 +51,9 @@ def delete_personal_data(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Personal data deleted successfully"}
 
+@router.get('/personal_data/user/{user_id}')
+def get_personal_data_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    personal_data = db.query(PersonalData).filter(PersonalData.user_id == user_id).first()
+    if not personal_data:
+        raise HTTPException(status_code=404, detail="Datos personales no encontrados")
+    return personal_data
