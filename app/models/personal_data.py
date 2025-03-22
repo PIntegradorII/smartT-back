@@ -7,7 +7,6 @@ class PersonalData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    nombre = Column(String, nullable=False)
     edad = Column(Integer, nullable=False)
     genero = Column(String, nullable=False)
 

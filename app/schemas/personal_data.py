@@ -3,7 +3,6 @@ from pydantic import BaseModel, EmailStr
 # Esquema base para la entrada y validación de datos
 class PersonalDataBase(BaseModel):
     user_id: int
-    nombre: str
     edad: int
     genero: str
 
