@@ -15,7 +15,7 @@ from app.core.config import settings
 import jwt
 import datetime
 from app.services.token_service import delete_token, save_token  # Usamos el servicio de token
-from app.services.user_service import create_or_get_user  # Usamos el servicio de usuario
+from app.services.user_service import create_or_get_user # Usamos el servicio de usuario
 from dotenv import load_dotenv
 import os
 
@@ -111,3 +111,11 @@ def logout(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Token inválido o ya expirado")
     delete_token(db, token)
     return {"message": "Sesión cerrada correctamente"}
+
+
+@router.get("/user_id/{google_id}", response_model=int)
+def get_user_id(google_id: str, db: Session = Depends(get_db)) -> int:
+    user = db.query(User).filter(User.google_id == google_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user.id

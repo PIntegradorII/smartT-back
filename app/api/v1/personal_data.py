@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.personal_data import PersonalData
 from app.schemas.personal_data import PersonalDataCreate, PersonalDataResponse
+from app.models.user import User
 
 router = APIRouter()
 
@@ -49,3 +50,4 @@ def delete_personal_data(id: int, db: Session = Depends(get_db)):
     db.delete(personal_data)
     db.commit()
     return {"detail": "Personal data deleted successfully"}
+
