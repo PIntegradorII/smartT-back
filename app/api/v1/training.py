@@ -104,7 +104,7 @@ def get_training_plan_by_google_id(google_id: str, db: Session = Depends(get_db)
 
     return plan
 
-
+#get dia
 
 @router.get("/daily-training-plan")
 def get_daily_training_plan(
