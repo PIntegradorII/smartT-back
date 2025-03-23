@@ -8,10 +8,22 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 import datetime
 import logging
+from fastapi import FastAPI
+from app.ejecutar_tarea import scheduler  # Importa el programador
+
+
 
 # Crear la instancia de FastAPI
 app = FastAPI(debug=settings.DEBUG)
+# Eventos de inicio y cierre
+@app.on_event("startup")
+def startup_event():
+    if not scheduler.running:
+        scheduler.start()# Inicia el programador al iniciar la aplicación
 
+@app.on_event("shutdown")
+def shutdown_event():
+    scheduler.shutdown() 
 # Verificación de conexión a la base de datos
 test_db_connection()
 
