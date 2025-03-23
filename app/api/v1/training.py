@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.training_plan import TrainingPlan
 from app.models.user import User
 from app.schemas.training_plan import TrainingPlanCreate  
-from app.services.training_service import generar_plan_entrenamiento
+from app.services.training_service import generar_plan_entrenamiento, modificar_rutina_dia
 import json  # Importar para convertir JSON a String
 from datetime import datetime
 
@@ -134,3 +134,52 @@ def get_daily_training_plan(
         "day": day_of_week.capitalize(),
         "routine": double_json_loads(daily_plan) or "No hay rutina",
     }
+
+@router.post("/generate-daily-training")
+def generate_daily_training(
+    day_of_week: str = Query(..., description="Día de la semana"),
+    current_routine: dict = Body(...)
+):
+    """
+    Genera una nueva rutina para un día específico basada en la rutina actual sin modificar la base de datos.
+    """
+    day_of_week = day_of_week.lower()
+
+    # Validar que el día ingresado sea válido
+    dias_validos = {"lunes", "martes", "miercoles", "jueves", "viernes"}
+    if day_of_week not in dias_validos:
+        raise HTTPException(status_code=400, detail="Día no válido")
+
+    # Generar la nueva rutina manteniendo el grupo muscular
+    new_routine = modificar_rutina_dia(day_of_week, current_routine)
+
+    if not new_routine:
+        raise HTTPException(status_code=500, detail="No se pudo generar la nueva rutina")
+
+    return {
+        "message": f"Rutina de {day_of_week.capitalize()} generada correctamente.",
+        "day": day_of_week.capitalize(),
+        "new_routine": new_routine,
+    }
+
+@router.put("/update-routine")
+def update_routine(user_id: int, day_of_week: str, new_routine: dict, db: Session = Depends(get_db)):
+    # Buscar la rutina del usuario
+    routine = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
+    
+    if not routine:
+        raise HTTPException(status_code=404, detail="Rutina no encontrada")
+    
+    # Verificar si el día es válido
+    if day_of_week not in ["lunes", "martes", "miercoles", "jueves", "viernes"]:
+        raise HTTPException(status_code=400, detail="Día inválido")
+
+    # Convertir el diccionario a JSON (si usas SQLAlchemy y guardas como String)
+    import json
+    setattr(routine, day_of_week, json.dumps(new_routine))
+
+    # Guardar cambios
+    db.commit()
+    db.refresh(routine)
+
+    return {"message": f"Rutina de {day_of_week} actualizada correctamente"}
