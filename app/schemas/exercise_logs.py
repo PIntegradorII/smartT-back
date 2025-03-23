@@ -3,6 +3,7 @@ from typing import Optional
 from typing import List, Optional
 from datetime import date
 
+
 class ExerciseLogCreate(BaseModel):
     user_id: int
     date: date  # Cambiar log_date a date para coincidir con el modelo SQLAlchemy
@@ -20,6 +21,8 @@ class ExerciseLogResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
 
 class ExerciseLogRequest(BaseModel):
     google_id: str

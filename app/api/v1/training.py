@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.training_plan import TrainingPlan
+from app.models.user import User
 from app.schemas.training_plan import TrainingPlanCreate  
 from app.services.training_service import generar_plan_entrenamiento
 import json  # Importar para convertir JSON a String
@@ -71,19 +72,32 @@ def double_json_loads(value):
     except json.JSONDecodeError:
         return None  # Evita errores si la conversión falla
 
-@router.get("/training-plan/{plan_id}")
-def get_training_plan(plan_id: int, db: Session = Depends(get_db)):
-    """Obtiene un plan de entrenamiento y convierte los datos de string JSON a objetos JSON"""
-    plan = db.query(TrainingPlan).filter(TrainingPlan.id == plan_id).first()
+@router.get("/training-plan/google/{google_id}")
+def get_training_plan_by_google_id(google_id: str, db: Session = Depends(get_db)):
+    """Obtiene el plan de entrenamiento de un usuario usando su google_id"""
     
+    # 1. Buscar el usuario por google_id
+    user = db.query(User).filter(User.google_id == google_id).first()
+    print(user)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
+    # 2. Obtener el ID del usuario
+    user_id = user.id
+
+    # 3. Buscar el plan de entrenamiento asociado al usuario
+    plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
+    print(plan)
     if not plan:
-        raise HTTPException(status_code=404, detail="Plan no encontrado")
+        raise HTTPException(status_code=404, detail="Plan de entrenamiento no encontrado")
 
+    # 4. Convertir los campos JSON doblemente serializados
     json_fields = ["lunes", "martes", "miercoles", "jueves", "viernes"]
-
-    # Convertir los campos JSON doblemente serializados
     for field in json_fields:
         setattr(plan, field, double_json_loads(getattr(plan, field)))
 
-    return plan  # Devuelve los datos corregidos
+    return plan
+
+
+
+

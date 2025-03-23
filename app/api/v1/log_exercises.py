@@ -92,7 +92,7 @@ def update_log_by_user_and_date(
     
 
 
-@router.get("/exercise/{log_id}", response_model=ExerciseLogResponse)
+@router.get("/exercise/{google_id}", response_model=ExerciseLogResponse)
 def get_log(log_id: int, db: Session = Depends(get_db)):
     log = db.query(ExerciseLog).filter(ExerciseLog.user_id == log_id).first()
     if not log:
@@ -107,7 +107,6 @@ def get_exercise_logs(request: ExerciseLogRequest, db: Session = Depends(get_db)
     if not logs:
         raise HTTPException(status_code=404, detail="No se encontraron registros para este usuario")
     
-    # Mapeo de los registros a la estructura deseada
     weekday_map = {
         0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
         4: "Viernes", 5: "Sábado", 6: "Domingo"
@@ -116,13 +115,21 @@ def get_exercise_logs(request: ExerciseLogRequest, db: Session = Depends(get_db)
     weekly_summary = []
     for log in logs:
         date_obj = log.date  # Asegurar que es un objeto datetime.date
-        day_name = weekday_map[date_obj.weekday()]  # Obtener nombre del día en español
-        formatted_date = date_obj.strftime("%d de %B")  # Formato "22 de marzo"
+        day_name = weekday_map[date_obj.weekday()]
+        formatted_date = date_obj.strftime("%d de %B")
         
         weekly_summary.append({
             "day": day_name,
             "completed": log.completed,
-            "date": formatted_date
+            "date": formatted_date,
+            "date_obj": date_obj  # Agregar el objeto fecha para ordenación
         })
-    
+
+    # Ordenar por fecha en orden ascendente
+    weekly_summary = sorted(weekly_summary, key=lambda x: x["date_obj"])
+
+    # Remover el campo auxiliar 'date_obj' antes de retornar
+    for entry in weekly_summary:
+        del entry["date_obj"]
+
     return weekly_summary
