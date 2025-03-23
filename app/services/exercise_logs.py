@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from datetime import date, timedelta
-from app.models.exercise_logs import ExerciseLog
+from datetime import date, timedelta, datetime
+from app.models.user import User
 from app.schemas.exercise_logs import ExerciseLogCreate, ExerciseLogUpdate, ExerciseLogResponse
+from app.models.exercise_logs import ExerciseLog
 
 # ✅ Registrar un nuevo log de ejercicio
 def create_exercise_log(db: Session, log_data: ExerciseLogCreate) -> ExerciseLogResponse:
@@ -29,26 +30,6 @@ def update_exercise_log(db: Session, log_id: int, log_data: ExerciseLogUpdate) -
     db.refresh(db_log)
     return db_log
 
-# ✅ Obtener el resumen semanal del usuario
-def get_weekly_summary(db: Session, user_id: int):
-    today = date.today()
-    start_week = today - timedelta(days=today.weekday())  # Lunes de la semana actual
-
-    logs = (
-        db.query(ExerciseLog)
-        .filter(ExerciseLog.user_id == user_id, ExerciseLog.date >= start_week)
-        .order_by(ExerciseLog.date)
-        .all()
-    )
-
-    summary = {
-        "user_id": user_id,
-        "week_start": start_week,
-        "week_end": start_week + timedelta(days=6),
-        "logs": [{"date": log.date, "completed": log.completed} for log in logs],
-    }
-
-    return summary
 
 # ✅ Eliminar un registro de ejercicio
 def delete_exercise_log(db: Session, log_id: int) -> bool:
@@ -58,3 +39,25 @@ def delete_exercise_log(db: Session, log_id: int) -> bool:
     db.delete(db_log)
     db.commit()
     return True
+
+def get_exercise_logs_by_google_id(db: Session, google_id: str):
+    """
+    Obtiene los registros de ejercicio del usuario con el google_id proporcionado solo para la semana actual (lunes a domingo).
+    """
+    user = db.query(User).filter(User.google_id == google_id).first()
+    print(user.id)
+    if not user:
+        return None  # Usuario no encontrado
+    
+    # Obtener la fecha actual
+    today = datetime.today().date()  # Convertimos a `date` para evitar problemas con `datetime`
+    
+    # Determinar el lunes de la semana actual
+    start_of_week = today - timedelta(days=today.weekday())  # Lunes de la semana actual
+    end_of_week = start_of_week + timedelta(days=6)  # Domingo de la semana actual
+    
+    return db.query(ExerciseLog).filter(
+        ExerciseLog.user_id == user.id,
+        ExerciseLog.date >= start_of_week,
+        ExerciseLog.date <= end_of_week
+    ).all()
