@@ -1,25 +1,21 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import date
 
 class ExerciseLogCreate(BaseModel):
     user_id: int
-    exercise_id: int
-    repetitions: int
-    weight: Optional[float] = None
+    date: date  # Cambiar `log_date` a `date` para coincidir con el modelo SQLAlchemy
     completed: bool
 
 class ExerciseLogUpdate(BaseModel):
-    repetitions: Optional[int] = None
-    weight: Optional[float] = None
+    date: Optional[date] = None
     completed: Optional[bool] = None
 
 class ExerciseLogResponse(BaseModel):
     id: int
     user_id: int
-    exercise_id: int
-    repetitions: int
-    weight: Optional[float] = None
+    date: date
     completed: bool
 
     class Config:
-        from_attributes = True  # Para compatibilidad con SQLAlchemy
+        orm_mode = True

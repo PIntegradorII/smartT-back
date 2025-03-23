@@ -3,18 +3,25 @@ from sqlalchemy.exc import IntegrityError
 from datetime import date, timedelta
 from app.models.exercise_logs import ExerciseLog
 from app.schemas.exercise_logs import ExerciseLogCreate, ExerciseLogUpdate, ExerciseLogResponse
-
+from app.models.user import User
 # ✅ Registrar un nuevo log de ejercicio
 def create_exercise_log(db: Session, log_data: ExerciseLogCreate) -> ExerciseLogResponse:
     try:
+        # Validar existencia del usuario
+        user_exists = db.query(User).filter(User.id == log_data.user_id).first()
+        if not user_exists:
+            raise ValueError(f"Usuario con id {log_data.user_id} no existe.")
+
+        # Crear registro
         db_log = ExerciseLog(**log_data.model_dump())
         db.add(db_log)
         db.commit()
         db.refresh(db_log)
         return db_log
-    except IntegrityError:
+    except IntegrityError as e:
         db.rollback()
-        raise ValueError("Error al crear el registro. Puede que la fecha ya exista para este usuario.")
+        raise ValueError(f"Error de integridad: {str(e.orig)}")
+
 
 # ✅ Actualizar un log de ejercicio
 def update_exercise_log(db: Session, log_id: int, log_data: ExerciseLogUpdate) -> ExerciseLogResponse:

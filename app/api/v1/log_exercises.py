@@ -46,23 +46,4 @@ def delete_log(log_id: int, db: Session = Depends(get_db)):
     return {"message": "Registro eliminado"}
 
 
-@router.post("/check_exercises")
-def check_unlogged_exercises(db: Session = Depends(get_db)):
-    try:
-        today = date.today()
-        users = db.query(User).all()
 
-        for user in users:
-            exercise_exists = db.query(ExerciseLog).filter(
-                ExerciseLog.user_id == user.id,
-                ExerciseLog.date == today
-            ).first()
-
-            if not exercise_exists:
-                new_log = ExerciseLog(user_id=user.id, date=today, completed=False)
-                db.add(new_log)
-
-        db.commit()
-        return {"message": "Tarea ejecutada"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al verificar ejercicios: {str(e)}")
