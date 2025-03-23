@@ -9,6 +9,11 @@ import json  # Importar para convertir JSON a String
 from datetime import datetime
 
 router = APIRouter()
+def obtener_dia_en_espanol():
+    """Obtiene el nombre del día en español."""
+    opciones = {"weekday": "long"}
+    formato_espanol = datetime.now().strftime('%A').capitalize()
+    return formato_espanol
 
 @router.get("/training-plan")
 def get_training_plan(
@@ -90,6 +95,8 @@ def get_training_plan(plan_id: int, db: Session = Depends(get_db)):
 
     return plan  # Devuelve los datos corregidos
 
+
+
 @router.get("/daily-training-plan")
 def get_daily_training_plan(
     user_id: int,
@@ -98,8 +105,9 @@ def get_daily_training_plan(
     """
     Endpoint para obtener la rutina del día basada en el usuario.
     """
+    
     # Obtener la fecha actual
-    day_of_week = datetime.now().strftime("%A").lower()  # Lunes -> "lunes", Martes -> "martes", etc.
+    day_of_week = obtener_dia_en_espanol();  # Lunes -> "lunes", Martes -> "martes", etc.
 
     # Buscar el plan de entrenamiento del usuario
     training_plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
