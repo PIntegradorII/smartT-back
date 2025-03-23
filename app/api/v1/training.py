@@ -99,7 +99,7 @@ def get_daily_training_plan(
     Endpoint para obtener la rutina del día basada en el usuario.
     """
     # Obtener la fecha actual
-    day_of_week = datetime.now().strftime("%A").lower()  # Lunes -> "lunes", Martes -> "martes", etc.
+    day_of_week = "lunes"  # Lunes -> "lunes", Martes -> "martes", etc.
 
     # Buscar el plan de entrenamiento del usuario
     training_plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
