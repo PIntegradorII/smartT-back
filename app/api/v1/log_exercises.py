@@ -1,18 +1,20 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.services.exercise_logs import (
     create_exercise_log,
+    get_exercise_logs_by_google_id,
     update_exercise_log,
-    get_weekly_summary,
     delete_exercise_log,
 )
-from app.schemas.exercise_logs import ExerciseLogCreate, ExerciseLogUpdate, ExerciseLogResponse
+from app.schemas.exercise_logs import ExerciseLogCreate, ExerciseLogRequest, ExerciseLogUpdate, ExerciseLogResponse,ExerciseLogResponseLog
 from datetime import date
 from app.models.exercise_logs import ExerciseLog, User
+from pydantic import BaseModel
 
-
-
+class GoogleIDRequest(BaseModel):
+    google_id: str
 
 
 router = APIRouter()
@@ -25,10 +27,6 @@ def mark_exercise(log_data: ExerciseLogCreate, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# ✅ Obtener el resumen semanal
-@router.get("/exercise/summary/")
-def get_summary(user_id: int, db: Session = Depends(get_db)):
-    return get_weekly_summary(db, user_id)
 
 # ✅ Actualizar un registro de ejercicio
 @router.patch("/exercise/{log_id}", response_model=ExerciseLogResponse)
@@ -69,6 +67,7 @@ def get_log_by_user_and_date(user_id: int, date: date, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="Log no encontrado para esta fecha.")
     return {"user_id": log.user_id, "date": log.date, "completed": log.completed}
 
+
 @router.patch("/exercise/logs/")
 def update_log_by_user_and_date(
     user_id: int,
@@ -90,3 +89,40 @@ def update_log_by_user_and_date(
     db.refresh(log)
     
     return {"user_id": log.user_id, "date": log.date, "completed": log.completed}
+    
+
+
+@router.get("/exercise/{log_id}", response_model=ExerciseLogResponse)
+def get_log(log_id: int, db: Session = Depends(get_db)):
+    log = db.query(ExerciseLog).filter(ExerciseLog.user_id == log_id).first()
+    if not log:
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
+    return log
+
+
+@router.post("/exercise/weekly/", response_model=List[dict])
+def get_exercise_logs(request: ExerciseLogRequest, db: Session = Depends(get_db)):
+    logs = get_exercise_logs_by_google_id(db, request.google_id)
+    
+    if not logs:
+        raise HTTPException(status_code=404, detail="No se encontraron registros para este usuario")
+    
+    # Mapeo de los registros a la estructura deseada
+    weekday_map = {
+        0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
+        4: "Viernes", 5: "Sábado", 6: "Domingo"
+    }
+    
+    weekly_summary = []
+    for log in logs:
+        date_obj = log.date  # Asegurar que es un objeto datetime.date
+        day_name = weekday_map[date_obj.weekday()]  # Obtener nombre del día en español
+        formatted_date = date_obj.strftime("%d de %B")  # Formato "22 de marzo"
+        
+        weekly_summary.append({
+            "day": day_name,
+            "completed": log.completed,
+            "date": formatted_date
+        })
+    
+    return weekly_summary
