@@ -78,7 +78,7 @@ def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
         # Obtener la ruta del usuario desde la base de datos
         ruta = db.execute(
                 text(
-                    "SELECT COUNT(u.id) as ruta FROM personal_data pd "
+                    "SELECT IF(COUNT(u.id) > 0, 1, 0) AS ruta FROM personal_data pd "
                     "INNER JOIN users u ON pd.user_id = u.id WHERE u.google_id = :google_id"
                 ),
                 {"google_id": google_id}

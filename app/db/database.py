@@ -32,7 +32,7 @@ Base = declarative_base()
 def test_db_connection():
     try:
         with engine.connect() as connection:
-            print("✅ Conexión a la base de datos establecida correctamente.")
+            print("✅ Conexión a la base de datos establecida correctamentes.")
     except Exception as e:
         print(f"❌ Error al conectar con la base de datos: {e}")
 
