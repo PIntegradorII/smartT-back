@@ -13,4 +13,5 @@ class User(Base):
     created_at = Column(Integer, default=0)
     health_data = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
     personal_data = relationship("PersonalData", back_populates="user", cascade="all, delete-orphan")
+ #   training = relationship("Training", back_populates="user", cascade="all, delete-orphan")
 User.tokens = relationship("Token", back_populates="user")
