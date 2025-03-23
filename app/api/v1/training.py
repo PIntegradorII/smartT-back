@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.training_plan import TrainingPlan
+from app.models.user import User
 from app.schemas.training_plan import TrainingPlanCreate  
 from app.services.training_service import generar_plan_entrenamiento
 import json  # Importar para convertir JSON a String
+from datetime import datetime
 
 router = APIRouter()
 
@@ -87,3 +89,31 @@ def get_training_plan(plan_id: int, db: Session = Depends(get_db)):
         setattr(plan, field, double_json_loads(getattr(plan, field)))
 
     return plan  # Devuelve los datos corregidos
+
+@router.get("/daily-training-plan")
+def get_daily_training_plan(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    """
+    Endpoint para obtener la rutina del día basada en el usuario.
+    """
+    # Obtener la fecha actual
+    day_of_week = datetime.now().strftime("%A").lower()  # Lunes -> "lunes", Martes -> "martes", etc.
+
+    # Buscar el plan de entrenamiento del usuario
+    training_plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
+
+    if not training_plan:
+        raise HTTPException(status_code=404, detail="Plan de entrenamiento no encontrado para el usuario")
+
+    # Obtener la rutina del día específico
+    daily_plan = getattr(training_plan, day_of_week, None)
+    if not daily_plan:
+        raise HTTPException(status_code=404, detail=f"No hay rutina para {day_of_week.capitalize()}")
+
+    # Convertir el JSON string a un diccionario para la respuesta
+    return {
+        "day": day_of_week.capitalize(),
+        "routine": double_json_loads(daily_plan) or "No hay rutina",
+    }
