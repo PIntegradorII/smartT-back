@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
-from typing import List, Optional
+from typing import  Optional
 from datetime import date
 
 
@@ -20,7 +19,7 @@ class ExerciseLogResponse(BaseModel):
     completed: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 

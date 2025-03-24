@@ -12,15 +12,14 @@ from datetime import datetime
 
 router = APIRouter()
 
-def obtener_dia_en_espanol():
-    """Obtiene el nombre del día en español."""
-    # Establecer la configuración regional en español
-    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')  # Para sistemas basados en Unix
-    # locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')  # Para Windows
+from zoneinfo import ZoneInfo
 
-    # Obtener el nombre del día
-    formato_espanol = datetime.now().strftime('%A').lower()
-    return formato_espanol
+def obtener_dia_en_espanol():
+    tz = ZoneInfo("America/Bogota")
+    hoy = datetime.now(tz)
+    dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    return dias_semana[hoy.weekday()]
+
 
 @router.get("/training-plan")
 def get_training_plan(

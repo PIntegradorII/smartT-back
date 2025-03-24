@@ -1,4 +1,3 @@
-
 import json
 import re
 import os
@@ -11,17 +10,21 @@ load_dotenv()
 api_key = os.getenv("TOGETHER_API_KEY")
 client = Together(api_key=api_key)
 
-# Datos estáticos del usuario (serán extraídos de la BD en el futuro)
-# USER_DATA = {
-#     "nombre": "Juan Pérez",
-#     "peso": 75,  # kg
-#     "altura": 1.75,  # m
-#     "sexo": "Masculino",
-#     "condiciones_medicas": ["Ninguna"],
-#     "meta_entrenamiento": "Aumentar masa muscular"
-# }
+# Lista de ejercicios permitidos
+EJERCICIOS_VALIDOS = [
+    "3/4 sit-up", "air bike", "barbell press sit-up",
+    "assisted pull-up", "barbell pullover", "cable bar lateral pulldown",
+    "barbell bench press", "cable cross-over variation", "barbell incline bench press",
+    "barbell straight leg deadlift", "dumbbell lying femoral", "lever lying leg curl",
+    "barbell close-grip bench press", "barbell lying triceps extension skull crusher", "assisted triceps dip (kneeling)",
+    "barbell squat (on knees)", "barbell bench squat", "barbell overhead squat",
+    "barbell curl", "barbell preacher curl", "barbell drag curl",
+    "barbell bent over row", "cable low seated row", "cable high row (kneeling)",
+    "barbell deadlift", "barbell front squat", "barbell lunge",
+    "barbell front raise", "barbell rear delt raise", "barbell seated overhead press"
+]
 
-# Plantilla de entrenamiento en JSON
+# Plantilla de entrenamiento en formato JSON
 JSON_TEMPLATE = {
     "lunes": {"titulo": "", "musculos": [], "ejercicios": [{"ejercicio": "", "series": 0, "repeticiones": ""}]},
     "martes": {"titulo": "", "musculos": [], "ejercicios": [{"ejercicio": "", "series": 0, "repeticiones": ""}]},
@@ -31,7 +34,9 @@ JSON_TEMPLATE = {
 }
 
 def chat_with_model(user_data):
-    """ Envía los datos del usuario a la IA y obtiene el plan de entrenamiento """
+    """Envía los datos del usuario a la IA y obtiene el plan de entrenamiento"""
+    ejercicios_lista = json.dumps(EJERCICIOS_VALIDOS, indent=2)
+
     chat_history = [
         {
             "role": "user",
@@ -45,11 +50,19 @@ def chat_with_model(user_data):
                 f"- Sexo: {user_data['sexo']}\n"
                 f"- Condiciones médicas: {', '.join(user_data['condiciones_medicas'])}\n"
                 f"- Meta del entrenamiento: {user_data['meta_entrenamiento']}\n\n"
-                f"Usa la siguiente estructura:\n\n{json.dumps(JSON_TEMPLATE, indent=2)}"
-                f"Dame la salida en formato JSON, por favor."
+                f"Instrucciones importantes:\n"
+                f"1. Usa **únicamente** los ejercicios contenidos en la siguiente lista.\n"
+                f"2. El nombre del ejercicio debe coincidir exactamente con los nombres de esta lista (sin traducciones, sin combinaciones, sin variaciones).\n"
+                f"3. El campo 'ejercicio' en el JSON debe contener el nombre exacto tomado de la lista.\n"
+                f"4. El campo 'titulo' de cada día también debe ser uno de esos nombres, elegido como representativo del día.\n"
+                f"5. No inventes ejercicios. No utilices ningún nombre que no esté en la lista.\n\n"
+                f"Lista de ejercicios permitidos:\n{ejercicios_lista}\n\n"
+                f"Formato de salida requerido (estructura JSON):\n{json.dumps(JSON_TEMPLATE, indent=2)}\n"
+                f"Devuelve únicamente el JSON como respuesta. No incluyas explicaciones, encabezados, ni texto adicional."
             )
         }
     ]
+
 
     response = client.chat.completions.create(
         model="deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
@@ -59,7 +72,7 @@ def chat_with_model(user_data):
     return response.choices[0].message.content
 
 def extraer_json(texto):
-    """ Extrae un JSON contenido en un string de la respuesta de la IA """
+    """Extrae un JSON contenido en un string de la respuesta de la IA"""
     patron_json = r"```json\n(.*?)\n```"
     coincidencia = re.search(patron_json, texto, re.DOTALL)
 
@@ -74,7 +87,7 @@ def extraer_json(texto):
         return None
 
 def generar_plan_entrenamiento(user_data):
-    """ Genera el plan de entrenamiento basado en los datos proporcionados por el usuario """
+    """Genera el plan de entrenamiento basado en los datos proporcionados por el usuario"""
     respuesta_ia = chat_with_model(user_data)
     return extraer_json(respuesta_ia)
 
