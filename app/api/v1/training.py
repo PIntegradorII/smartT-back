@@ -7,12 +7,19 @@ from app.schemas.training_plan import TrainingPlanCreate
 from app.services.training_service import generar_plan_entrenamiento, modificar_rutina_dia
 import json  # Importar para convertir JSON a String
 from datetime import datetime
+import locale
+from datetime import datetime
 
 router = APIRouter()
+
 def obtener_dia_en_espanol():
     """Obtiene el nombre del día en español."""
-    opciones = {"weekday": "long"}
-    formato_espanol = datetime.now().strftime('%A').capitalize()
+    # Establecer la configuración regional en español
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')  # Para sistemas basados en Unix
+    # locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')  # Para Windows
+
+    # Obtener el nombre del día
+    formato_espanol = datetime.now().strftime('%A').lower()
     return formato_espanol
 
 @router.get("/training-plan")
@@ -114,9 +121,8 @@ def get_daily_training_plan(
     """
     Endpoint para obtener la rutina del día basada en el usuario.
     """
-    
-    # Obtener la fecha actual
-    day_of_week = obtener_dia_en_espanol();  # Lunes -> "lunes", Martes -> "martes", etc.
+    # Obtener el día actual
+    day_of_week = obtener_dia_en_espanol()  # Ejemplo: "lunes", "domingo", etc.
 
     # Buscar el plan de entrenamiento del usuario
     training_plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
@@ -124,17 +130,26 @@ def get_daily_training_plan(
     if not training_plan:
         raise HTTPException(status_code=404, detail="Plan de entrenamiento no encontrado para el usuario")
 
+    # Validar si el día tiene una rutina definida
+    if day_of_week not in ["lunes", "martes", "miercoles", "jueves", "viernes"]:
+        return {
+            "day": day_of_week.capitalize(),
+            "routine": "No hay rutina definida para este día.",
+        }
+
     # Obtener la rutina del día específico
     daily_plan = getattr(training_plan, day_of_week, None)
     if not daily_plan:
-        raise HTTPException(status_code=404, detail=f"No hay rutina para {day_of_week.capitalize()}")
+        return {
+            "day": day_of_week.capitalize(),
+            "routine": "No hay rutina definida para este día.",
+        }
 
     # Convertir el JSON string a un diccionario para la respuesta
     return {
         "day": day_of_week.capitalize(),
         "routine": double_json_loads(daily_plan) or "No hay rutina",
     }
-
 @router.post("/generate-daily-training")
 def generate_daily_training(
     day_of_week: str = Query(..., description="Día de la semana"),
