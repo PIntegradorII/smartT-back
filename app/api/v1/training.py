@@ -12,11 +12,13 @@ from datetime import datetime
 
 router = APIRouter()
 
-import datetime
+from zoneinfo import ZoneInfo
 
 def obtener_dia_en_espanol():
-    dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-    return dias[datetime.datetime.today().weekday()]
+    tz = ZoneInfo("America/Bogota")
+    hoy = datetime.now(tz)
+    dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    return dias_semana[hoy.weekday()]
 
 
 @router.get("/training-plan")
