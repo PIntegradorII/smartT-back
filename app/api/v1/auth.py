@@ -57,11 +57,12 @@ def get_db():
 # Verificar token de Firebase
 def verify_firebase_token(token: str):
     try:
-        # Verificar el token de Firebase con el argumento correcto
-        decoded_token = auth.verify_id_token(token, clock_skew_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        decoded_token = auth.verify_id_token(token)
         return decoded_token
-    except auth.InvalidIdTokenError as e:
-        raise HTTPException(status_code=400, detail=f"Token de Firebase inválido: {e}")
+    except auth.InvalidIdTokenError:
+        raise HTTPException(status_code=400, detail="Token de Firebase inválido")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al verificar el token: {str(e)}")
 
 
 @router.post("/google-login")
