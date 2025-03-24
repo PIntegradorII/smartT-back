@@ -53,10 +53,8 @@ def chat_with_model(user_data):
                 f"Instrucciones importantes:\n"
                 f"1. Usa **únicamente** los ejercicios contenidos en la siguiente lista.\n"
                 f"2. El nombre del ejercicio debe coincidir exactamente con los nombres de esta lista (sin traducciones, sin combinaciones, sin variaciones).\n"
-                f"3. El campo 'ejercicio' en el JSON debe contener el nombre exacto tomado de la lista.\n"
-                f"4. El campo 'titulo' de cada día también debe ser uno de esos nombres, elegido como representativo del día.\n"
-                f"5. No inventes ejercicios. No utilices ningún nombre que no esté en la lista.\n\n"
                 f"Lista de ejercicios permitidos:\n{ejercicios_lista}\n\n"
+                f"Minimo requiero 5 ejercicios por día.\n"
                 f"Formato de salida requerido (estructura JSON):\n{json.dumps(JSON_TEMPLATE, indent=2)}\n"
                 f"Devuelve únicamente el JSON como respuesta. No incluyas explicaciones, encabezados, ni texto adicional."
             )
@@ -95,7 +93,7 @@ def generar_plan_entrenamiento(user_data):
 
 def modificar_rutina_dia(dia, rutina_actual):
     """ Modifica la rutina de un día específico manteniendo el grupo muscular """
-    
+    ejercicios_lista = json.dumps(EJERCICIOS_VALIDOS, indent=2)
     chat_history = [
         {
             "role": "user",
@@ -104,6 +102,11 @@ def modificar_rutina_dia(dia, rutina_actual):
                 f"Conserva el mismo grupo de músculos pero cambia los ejercicios y sus repeticiones.\n"
                 f"Aquí está la rutina actual:\n"
                 f"{json.dumps(rutina_actual, indent=2)}\n"
+                f"Instrucciones importantes:\n"
+                f"1. Usa **únicamente** los ejercicios contenidos en la siguiente lista.\n"
+                f"2. El nombre del ejercicio debe coincidir exactamente con los nombres de esta lista (sin traducciones, sin combinaciones, sin variaciones).\n"
+                f"Lista de ejercicios permitidos:\n{ejercicios_lista}\n\n"
+                f"Minimo requiero 5 ejercicios por día.\n"
                 f"Devuélveme el resultado en este mismo formato JSON, solo con los ejercicios y repeticiones modificados."
             )
         }
