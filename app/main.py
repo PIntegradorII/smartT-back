@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, users, routines, health, exercises, personal_data, training, log_exercises
+from app.api.v1 import auth, users, routines, health, exercises, personal_data, training, log_exercises, physical  # Importar el nuevo módulo
 from app.core.config import settings
 from app.db.database import test_db_connection
 import requests
@@ -104,3 +104,4 @@ app.include_router(exercises.router, prefix="/v1/exercises", tags=["Exercises"])
 app.include_router(personal_data.router, prefix="/v1/personal_data", tags=["PersonalData"])
 app.include_router(training.router, prefix="/v1/training", tags=["Training"])
 app.include_router(log_exercises.router, prefix="/v1/log_exercises", tags=["LogExercises"])
+app.include_router(physical.router, prefix="/v1/physical", tags=["Physical"]) 
