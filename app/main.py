@@ -10,7 +10,8 @@ import datetime
 import logging
 from fastapi import FastAPI
 from app.ejecutar_tarea import scheduler  # Importa el programador
-
+import locale
+import os
 
 
 # Crear la instancia de FastAPI
@@ -38,6 +39,20 @@ app.add_middleware(
 
 # Configurar logging para eventos del job scheduler
 logging.basicConfig(level=logging.INFO)
+
+
+
+# Configurar el Locale
+try:
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+except locale.Error:
+    print("⚠️ No se pudo establecer el locale 'es_ES.UTF-8'. Usando el predeterminado.")
+
+# Obtener la configuración del locale actual
+print(f"🌍 Locale actual: {locale.getlocale()}")
+
+
+
 
 # ✅ Función que se ejecutará en segundo plano
 def marcar_no_registrado():
