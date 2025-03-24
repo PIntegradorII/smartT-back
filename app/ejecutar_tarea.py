@@ -1,4 +1,3 @@
-import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal

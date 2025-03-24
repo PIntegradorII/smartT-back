@@ -8,27 +8,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 import datetime
 import logging
-from fastapi import FastAPI
-from app.ejecutar_tarea import scheduler  # Importa el programador
 import locale
-import os
 
-
-# Crear la instancia de FastAPI
+# ✅ Instancia de FastAPI
 app = FastAPI(debug=settings.DEBUG)
-# Eventos de inicio y cierre
-@app.on_event("startup")
-def startup_event():
-    if not scheduler.running:
-        scheduler.start()# Inicia el programador al iniciar la aplicación
 
-@app.on_event("shutdown")
-def shutdown_event():
-    scheduler.shutdown() 
-# Verificación de conexión a la base de datos
-test_db_connection()
-
-# Configurar CORS
+# ✅ Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*", "http://localhost:3000"],  
@@ -37,49 +22,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configurar logging para eventos del job scheduler
+# ✅ Configurar logging para eventos del scheduler
 logging.basicConfig(level=logging.INFO)
 
-
-
-# Configurar el Locale
+# ✅ Configurar Locale
 try:
     locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 except locale.Error:
     print("⚠️ No se pudo establecer el locale 'es_ES.UTF-8'. Usando el predeterminado.")
 
-# Obtener la configuración del locale actual
 print(f"🌍 Locale actual: {locale.getlocale()}")
-
-
-
 
 # ✅ Función que se ejecutará en segundo plano
 def marcar_no_registrado():
     try:
         url = "http://127.0.0.1:8000/check_exercises"  # Cambia esto por la URL de tu API
         response = requests.post(url)
-        response.raise_for_status()  # Lanzar una excepción si la respuesta es un error HTTP
-        print(f"Respuesta de la API: {response.status_code} - {datetime.datetime.now()}")
+        response.raise_for_status()  
+        print(f"✅ Respuesta de la API: {response.status_code} - {datetime.datetime.now()}")
     except requests.exceptions.RequestException as e:
-        print(f"Error al ejecutar la tarea en segundo plano: {str(e)}")
-        logging.error(f"Error al ejecutar la tarea en segundo plano: {str(e)}")
+        print(f"❌ Error en la tarea programada: {str(e)}")
+        logging.error(f"Error en la tarea programada: {str(e)}")
 
-# Agregar eventos para el seguimiento de la tarea programada
+# ✅ Agregar eventos para el seguimiento del scheduler
 def job_listener(event):
     if event.exception:
-        logging.error(f"Error en la tarea programada: {event.job_id}")
+        logging.error(f"❌ Error en la tarea programada: {event.job_id}")
     else:
-        logging.info(f"Tarea ejecutada correctamente: {event.job_id}")
+        logging.info(f"✅ Tarea ejecutada correctamente: {event.job_id}")
 
-# Iniciar el programador de tareas
+# ✅ Iniciar el programador de tareas
 scheduler = BackgroundScheduler()
-# Agregar la tarea para que se ejecute todos los días a medianoche
-scheduler.add_job(marcar_no_registrado, "cron", hour=0, minute=0)  # Ejecutar a las 00:00 cada día
+scheduler.add_job(marcar_no_registrado, "cron", hour=0, minute=0, max_instances=1)  # Ejecutar a las 00:00 cada día
 scheduler.add_listener(job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
-scheduler.start()
 
-# ✅ Endpoint para ejecutar la tarea en segundo plano
+# ✅ Eventos de inicio y cierre
+@app.on_event("startup")
+def startup_event():
+    test_db_connection()  # Verificar conexión a la BD
+    if not scheduler.running:
+        print("🔄 Iniciando APScheduler...")
+        scheduler.start()  # Inicia el programador solo si no está corriendo
+
+@app.on_event("shutdown")
+def shutdown_event():
+    print("🛑 Deteniendo APScheduler...")
+    scheduler.shutdown()
+
+# ✅ Endpoint para ejecutar la tarea en segundo plano manualmente
 @app.post("/run_background_task")
 def run_background_task(background_tasks: BackgroundTasks):
     try:
@@ -88,6 +78,7 @@ def run_background_task(background_tasks: BackgroundTasks):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al iniciar la tarea: {str(e)}")
 
+# ✅ Endpoint de prueba
 @app.get("/")
 def root():
     return {"message": "API funcionando correctamente. Consulta /docs para más información."}
@@ -104,7 +95,7 @@ def get_config():
         "debug": settings.DEBUG
     }
 
-# Registrar los routers
+# ✅ Registrar los routers
 app.include_router(auth.router, prefix="/v1/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/v1/users", tags=["Users"])
 app.include_router(routines.router, prefix="/v1/routines", tags=["Routines"])
