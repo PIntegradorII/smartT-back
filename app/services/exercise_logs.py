@@ -4,6 +4,7 @@ from datetime import date, timedelta, datetime
 from app.models.user import User
 from app.schemas.exercise_logs import ExerciseLogCreate, ExerciseLogUpdate, ExerciseLogResponse
 from app.models.exercise_logs import ExerciseLog
+import pytz
 
 # ✅ Registrar un nuevo log de ejercicio
 def create_exercise_log(db: Session, log_data: ExerciseLogCreate) -> ExerciseLogResponse:
@@ -47,24 +48,33 @@ def delete_exercise_log(db: Session, log_id: int) -> bool:
     db.commit()
     return True
 
+def get_colombia_date():
+    """
+    Obtiene la fecha actual en la zona horaria de Colombia.
+    """
+    tz = pytz.timezone("America/Bogota")
+    return datetime.now(tz).date()
+
+
 def get_exercise_logs_by_google_id(db: Session, google_id: str):
     """
     Obtiene los registros de ejercicio del usuario con el google_id proporcionado solo para la semana actual (lunes a domingo).
     """
     user = db.query(User).filter(User.google_id == google_id).first()
-    print(user.id)
+    
     if not user:
-        return None  # Usuario no encontrado
+        return []  # Retorna una lista vacía en lugar de None
+
+    today = get_colombia_date()  # Obtener la fecha en la zona horaria correcta
     
-    # Obtener la fecha actual
-    today = datetime.today().date()  # Convertimos a `date` para evitar problemas con `datetime`
-    
-    # Determinar el lunes de la semana actual
+    # Determinar el lunes y domingo de la semana actual
     start_of_week = today - timedelta(days=today.weekday())  # Lunes de la semana actual
     end_of_week = start_of_week + timedelta(days=6)  # Domingo de la semana actual
-    
-    return db.query(ExerciseLog).filter(
+
+    logs = db.query(ExerciseLog).filter(
         ExerciseLog.user_id == user.id,
         ExerciseLog.date >= start_of_week,
         ExerciseLog.date <= end_of_week
     ).all()
+
+    return logs  # Siempre devolver una lista

@@ -90,3 +90,33 @@ def generar_plan_entrenamiento(user_data):
     """Genera el plan de entrenamiento basado en los datos proporcionados por el usuario"""
     respuesta_ia = chat_with_model(user_data)
     return extraer_json(respuesta_ia)
+
+
+
+def modificar_rutina_dia(dia, rutina_actual):
+    """ Modifica la rutina de un día específico manteniendo el grupo muscular """
+    
+    chat_history = [
+        {
+            "role": "user",
+            "content": (
+                f"Eres un entrenador de gimnasio experto. Necesito modificar la rutina de entrenamiento del {dia}. "
+                f"Conserva el mismo grupo de músculos pero cambia los ejercicios y sus repeticiones.\n"
+                f"Aquí está la rutina actual:\n"
+                f"{json.dumps(rutina_actual, indent=2)}\n"
+                f"Devuélveme el resultado en este mismo formato JSON, solo con los ejercicios y repeticiones modificados."
+            )
+        }
+    ]
+    
+    response = client.chat.completions.create(
+        model="deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+        messages=chat_history
+    )
+    
+    nueva_rutina = extraer_json(response.choices[0].message.content)
+    
+    return nueva_rutina if nueva_rutina else rutina_actual  # Si falla, devolver la rutina original
+
+
+
