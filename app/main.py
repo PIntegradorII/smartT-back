@@ -6,7 +6,7 @@ from app.db.database import test_db_connection
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
-import datetime
+from datetime import datetime
 import logging
 import locale
 from app.ejecutar_tarea import create_logs_for_all_users
@@ -33,6 +33,8 @@ except locale.Error:
 
 print(f"🌍 Locale actual: {locale.getlocale()}")
 
+current_time = datetime.now().strftime("%A, %d de %B de %Y %H:%M:%S")
+print(f"🕒 Hora actual: {current_time}")
 
 
 # ✅ Agregar eventos para el seguimiento del scheduler
