@@ -32,5 +32,5 @@ def create_logs_for_all_users():
 
 # Configurar y registrar la tarea programada
 scheduler = BackgroundScheduler()
-scheduler.add_job(create_logs_for_all_users, "cron", hour=19, minute=50)  # Se ejecuta al final del día
+scheduler.add_job(create_logs_for_all_users, "cron", hour=5, minute=0)  # Se ejecuta al final del día
 scheduler.start()
