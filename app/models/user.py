@@ -15,5 +15,6 @@ class User(Base):
     health_data = relationship("HealthData", back_populates="user", cascade="all, delete-orphan")
     personal_data = relationship("PersonalData", back_populates="user", cascade="all, delete-orphan")
     physical_data = relationship("PhysicalData", back_populates="user", cascade="all, delete-orphan")
+    diet_plan = relationship("DietPlan", back_populates="user", cascade="all, delete-orphan")
 
 User.tokens = relationship("Token", back_populates="user")
