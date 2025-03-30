@@ -15,6 +15,12 @@ class DietPlanUpdate(BaseModel):
 
 class DietPlanResponse(DietPlanBase):
     id: int
+    
+    # Convertir el string JSON a dict
+    @property
+    def nutrition_plan(self):
+        try:
+            return json.loads(self.plan) if self.plan else None
+        except json.JSONDecodeError:
+            return None
 
-    class Config:
-        orm_mode = True  # Esto es necesario para que Pydantic pueda trabajar con ORM (como SQLAlchemy)

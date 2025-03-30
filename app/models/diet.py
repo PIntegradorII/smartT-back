@@ -11,4 +11,5 @@ class DietPlan(Base):
     plan = Column(Text, nullable=True)
 
     # Relación con el modelo User
-    user = relationship("User", back_populates="diet_plans")
+    user = relationship("User", back_populates="diet_plan")
+
