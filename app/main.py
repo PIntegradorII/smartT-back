@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import auth, users, routines, health, exercises, personal_data, training, log_exercises, physical  # Importar el nuevo módulo
+from app.api.v1 import auth, diet, users, routines, health, exercises, personal_data, training, log_exercises, physical  # Importar el nuevo módulo
 from app.core.config import settings
 from app.db.database import test_db_connection
 import requests
@@ -10,8 +10,16 @@ from datetime import datetime
 import logging
 import locale
 from app.ejecutar_tarea import create_logs_for_all_users
+from app.services.watson import speech_to_text
+import os
 # ✅ Instancia de FastAPI
 app = FastAPI(debug=settings.DEBUG)
+
+
+# Inicializa los servicios una ve
+
+
+
 
 # ✅ Configurar CORS
 app.add_middleware(
@@ -21,6 +29,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Diagnóstico para verificar carga de variables de entorno
+print(f"STT API Key: {os.getenv('IBM_STT_API_KEY')}, STT URL: {os.getenv('IBM_STT_URL')}")
+print(f"TTS API Key: {os.getenv('IBM_TTS_API_KEY')}, TTS URL: {os.getenv('IBM_TTS_URL')}")
 
 # ✅ Configurar logging para eventos del scheduler
 logging.basicConfig(level=logging.INFO)
@@ -91,3 +102,4 @@ app.include_router(personal_data.router, prefix="/v1/personal_data", tags=["Pers
 app.include_router(training.router, prefix="/v1/training", tags=["Training"])
 app.include_router(log_exercises.router, prefix="/v1/log_exercises", tags=["LogExercises"])
 app.include_router(physical.router, prefix="/v1/physical", tags=["Physical"]) 
+app.include_router(diet.router, prefix="/v1/diet", tags=["Diet"])
