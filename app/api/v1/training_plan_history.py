@@ -14,7 +14,6 @@ def get_routine_history(google_id: str, db: Session = Depends(get_db)):
     Obtiene el historial de rutinas de un usuario basado en su Google ID.
     """
     user = db.query(User).filter(User.google_id == google_id).first()
-
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
