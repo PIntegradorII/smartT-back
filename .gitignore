@@ -27,3 +27,7 @@ pip-log.txt
 # Archivo específico a ignorar
 structure-project.py
 .qodo
+
+
+.pytest_cache/
+tests/.pytest_cache/
