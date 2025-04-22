@@ -1,10 +1,14 @@
+from typing import List
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.training_plan import TrainingPlan
 from app.models.user import User
+from app.schemas.physical import PhysicalDataCreate
+from app.schemas.physical_history import PhysicalHistorySchema
 from app.schemas.training_plan import TrainingPlanCreate  
-from app.services.training_service import generar_plan_entrenamiento, modificar_rutina_dia
+from app.services.training_service import analizar_progreso_fisico, generar_plan_entrenamiento, modificar_rutina_dia
 import json  # Importar para convertir JSON a String
 from datetime import datetime
 import locale
@@ -197,3 +201,19 @@ def update_routine(user_id: int, day_of_week: str, new_routine: dict, db: Sessio
     db.refresh(routine)
 
     return {"message": f"Rutina de {day_of_week} actualizada correctamente"}
+
+
+class ProgresoRequest(BaseModel):
+    current_data: PhysicalDataCreate
+    historial: List[PhysicalHistorySchema]
+    pregunta: str
+
+@router.post("/analizar-progreso-fisico")
+def analizar_progreso_fisico_route(payload: ProgresoRequest):
+    respuesta = analizar_progreso_fisico(
+        current_data=payload.current_data,
+        historial=payload.historial,
+        pregunta_usuario=payload.pregunta
+    )
+    return {"respuesta": respuesta}
+    

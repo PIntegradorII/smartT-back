@@ -44,10 +44,10 @@ def get_recipe_from_ingredients(ingredients_text):
       ]
     }}
     ```
-
-    4. **Devuelve únicamente el JSON sin explicaciones adicionales.**  
-    5. No incluyas ingredientes que el usuario no mencionó.  
-    6. **No agregues comentarios ni explicaciones. Solo devuelve el JSON puro.**  
+    4. En la sección de preparación, describe cada paso con mayor detalle. Es importante que las instrucciones sean claras y fáciles de seguir, ya que están dirigidas a personas sin experiencia en cocina.
+    5. **Devuelve únicamente el JSON sin explicaciones adicionales.**  
+    6. No incluyas ingredientes que el usuario no mencionó.  
+    7. **No agregues comentarios ni explicaciones. Solo devuelve el JSON puro.**  
     """
     # Llamar al modelo de IA
     response = client.chat.completions.create(

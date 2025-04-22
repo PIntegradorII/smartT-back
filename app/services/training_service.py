@@ -4,6 +4,8 @@ import os
 from dotenv import load_dotenv
 from together import Together
 
+from app.schemas.physical import PhysicalDataCreate
+
 load_dotenv()
 
 # Inicializar cliente con la API Key de Together
@@ -122,4 +124,35 @@ def modificar_rutina_dia(dia, rutina_actual):
     return nueva_rutina if nueva_rutina else rutina_actual  # Si falla, devolver la rutina original
 
 
+def analizar_progreso_fisico(current_data: PhysicalDataCreate, historial: list, pregunta_usuario: str):
+    """
+    Analiza el progreso físico del usuario en función de sus datos actuales y el historial reciente.
+    Devuelve una respuesta breve (2-3 líneas) centrada en cambios importantes.
+    Si la pregunta no tiene relación con el progreso físico, lo indica.
+    """
 
+    prompt = (
+        "Eres un entrenador personal experto. Analiza de forma concisa el progreso físico de un usuario "
+        "comparando sus medidas actuales con las anteriores. Responde en 2 o 3 líneas máximo, usando lenguaje claro y directo. "
+        "Menciona si hubo mejoras o retrocesos en medidas clave (peso, IMC, cintura, etc.). No des explicaciones largas.\n\n"
+        "Si la pregunta no tiene relación con fitness o progreso físico, responde: "
+        "'Tu pregunta no está relacionada con tu progreso físico, no puedo responder eso.'\n\n"
+    )
+
+    mensaje = prompt
+    mensaje += "📊 Medidas actuales:\n"
+    mensaje += f"- Peso: {current_data.peso} kg, IMC: {current_data.imc}, Cintura: {current_data.cintura} cm, Objetivo: {current_data.objetivo}\n\n"
+
+    if historial:
+        last = historial[-1]
+        mensaje += "📉 Último registro anterior:\n"
+        mensaje += f"- Peso: {last.peso} kg, IMC: {last.imc}, Cintura: {last.cintura} cm, Objetivo: {last.objetivo} (Fecha: {last.created_at.date()})\n\n"
+
+    mensaje += f"❓ Pregunta del usuario: \"{pregunta_usuario}\"\n"
+
+    response = client.chat.completions.create(
+        model="deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+        messages=[{"role": "user", "content": mensaje}]
+    )
+
+    return response.choices[0].message.content.strip()
