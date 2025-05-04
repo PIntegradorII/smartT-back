@@ -25,26 +25,20 @@ async def voice_to_text(
   
         # Determinar el tipo de contenido basado en el nombre del archivo
         content_type = "audio/wav" if audio.filename.endswith(".wav") else audio.content_type
-        print(f"Tipo de contenido: {content_type}")
 
         # Convertir de audio a texto
         transcript = speech_to_text(audio_bytes, content_type=content_type)
-        print("transcript", transcript)
         
         #transcript = """ cebolla, ajo, aceite de oliva, sal, pimienta, pollo. """
         # Llamar a la API de recetas con los ingredientes transcritos
         
         recipe = get_recipe_from_ingredients(transcript)
-        print("recipe", recipe)
         # Buscar al usuario por su google_id
         user = db.query(User).filter(User.google_id == google_id).first()
-        print("user", user)
         if not user:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
-        print(user.id, transcript, recipe)
         # Guardar o actualizar la receta
         save_or_update_recipe(user.id, transcript, recipe)
-        print("Receta guardada o actualizada correctamente", save_or_update_recipe)
         # Devolver la receta generada y la transcripción del audio
         return {"transcript": transcript, "recipe": recipe}
 

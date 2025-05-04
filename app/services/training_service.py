@@ -80,10 +80,8 @@ def extraer_json(texto):
         try:
             return json.loads(coincidencia.group(1))
         except json.JSONDecodeError:
-            print("Error: El JSON extraído no es válido.")
             return None
     else:
-        print("No se encontró JSON en el texto.")
         return None
 
 def generar_plan_entrenamiento(user_data):

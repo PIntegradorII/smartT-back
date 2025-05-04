@@ -112,5 +112,3 @@ for file, content in files.items():
     file_path = os.path.join(base_path, file)
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
-
-print(f"Estructura de proyecto creada correctamente en {base_path}")

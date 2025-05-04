@@ -94,7 +94,6 @@ def get_training_plan_by_google_id(google_id: str, db: Session = Depends(get_db)
     
     # 1. Buscar el usuario por google_id
     user = db.query(User).filter(User.google_id == google_id).first()
-    print(user)
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
@@ -103,7 +102,6 @@ def get_training_plan_by_google_id(google_id: str, db: Session = Depends(get_db)
 
     # 3. Buscar el plan de entrenamiento asociado al usuario
     plan = db.query(TrainingPlan).filter(TrainingPlan.user_id == user_id).first()
-    print(plan)
     if not plan:
         raise HTTPException(status_code=404, detail="Plan de entrenamiento no encontrado")
 

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware# Importar el nuevo módulo
-from app.api.v1 import auth, users, routines, health, ingredients, exercises,diet, personal_data, training, log_exercises, physical, training_plan_history, physical_history  # Importar el nuevo módulo
+from app.api.v1 import auth, users, routines, health, ingredients, exercises,diet, personal_data, training, log_exercises, physical, training_plan_history, physical_history, hist_recetas,  img_maquinas # Importar el nuevo módulo
 from app.core.config import settings
 from app.db.database import test_db_connection
 import requests
@@ -29,9 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Diagnóstico para verificar carga de variables de entorno
-print(f"STT API Key: {os.getenv('IBM_STT_API_KEY')}, STT URL: {os.getenv('IBM_STT_URL')}")
-print(f"TTS API Key: {os.getenv('IBM_TTS_API_KEY')}, TTS URL: {os.getenv('IBM_TTS_URL')}")
+
 
 # ✅ Configurar logging para eventos del scheduler
 logging.basicConfig(level=logging.INFO)
@@ -106,3 +104,6 @@ app.include_router(diet.router, prefix="/v1/diet", tags=["Diet"])
 app.include_router(training_plan_history.router, prefix="/v1/training_plan_history", tags=["Training_plan_history"])
 app.include_router(ingredients.router, prefix="/v1/ingredientes", tags=["Ingredients"])
 app.include_router(physical_history.router, prefix="/v1/physical_history", tags=["Measures"])
+
+app.include_router(hist_recetas.router, prefix="/v1/hist_recetas", tags=["hist_recetas"])
+app.include_router(img_maquinas.router, prefix="/v1/img_maquinas", tags=["img_maquinas"])
