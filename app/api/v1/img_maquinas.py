@@ -18,10 +18,10 @@ async def scan_machine(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    os.makedirs("uploads", exist_ok=True)
+    os.makedirs("maquinasIMG/uploads", exist_ok=True)
 
     image_filename = f"{uuid.uuid4()}.jpg"
-    image_path = os.path.join("uploads", image_filename)
+    image_path = os.path.join("maquinasIMG/uploads", image_filename)
 
     try:
         with open(image_path, "wb") as buffer:

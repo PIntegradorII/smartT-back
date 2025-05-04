@@ -1,11 +1,12 @@
 import os
 from openai import OpenAI
 import base64
+from dotenv import load_dotenv
 
 # Configuración del cliente
 client = OpenAI(
-    api_key="1ee88f95e978b5f7b320772982aeb59b6c8f100eaf5e5e0ed0c2c6c94340f525",  # Reemplaza con tu API Key real
-    base_url="https://api.together.xyz/v1",
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL")
 )
 
 def encode_image(image_path):
