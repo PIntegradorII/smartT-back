@@ -16,10 +16,10 @@ def encode_image(image_path):
 
 def analyze_machine(image_path):
     prompt = (
-        "Eres un asistente que responde exclusivamente en español. No incluyas texto fuera del JSON solicitado."
+         "Eres un asistente que responde exclusivamente en español. No incluyas texto fuera del JSON solicitado."
         "Analiza la imagen de la máquina de ejercicio. "
-        "Asegúrate de que el campo 'musculos_trabajados' incluya todos los músculos que razonablemente puedan estar involucrados en el uso de la máquina, incluyendo músculos secundarios si es posible."
-        "Si no es una máquina de ejercicio, devuelve un JSON con la clave 'error' y el valor 'No es una máquina de ejercicio'. "
+        "Si la imagen no es de una máquina de ejercicio o es irreconocible (por ejemplo, si es una pared, un objeto que no parece una máquina, o una imagen que no puede ser identificada), "
+        "debe devolver un JSON con la clave 'error' y el valor 'No es una máquina de ejercicio'. "
         "Si la imagen corresponde a una máquina de ejercicio, devuelve un JSON con las siguientes claves y valores: "
         '{ '
         '"nombre_maquina": "Nombre completo de la máquina de ejercicio (por ejemplo, Banco de Peso, Bicicleta Estática, Máquina de Prensa de Piernas)", '
@@ -31,8 +31,8 @@ def analyze_machine(image_path):
         '"estado": "Si la máquina parece estar en mal estado o incompleta, devuelve el valor \'dañada\' o \'incompleta\' dependiendo de lo que veas (por ejemplo, si hay piezas rotas o faltantes, o si la máquina no tiene parte de su estructura). Si no hay indicios de daño, simplemente omite este campo.", '
         '} '
         "Si alguno de los valores no puede determinarse con certeza, devuelve 'null' para esa clave, pero no dejes claves vacías. "
-        "En el caso de que la imagen no sea suficiente para identificar la máquina o no haya una máquina visible, asegúrate de que la respuesta sea un JSON bien formado que incluya solo la clave 'error' con el valor correspondiente. "
-        "No escribas nada más fuera del JSON, y asegúrate de que todos los campos sean completados correctamente de acuerdo con los datos disponibles en la imagen. "
+        "Si la imagen no corresponde a una máquina de ejercicio, no contiene una máquina visible, o es imposible de identificar, asegúrate de que la respuesta sea un JSON bien formado que incluya solo la clave 'error' con el valor correspondiente. "
+        "No escribas nada más fuera del JSON. "
         "Por ejemplo, una salida válida podría ser: "
         '{ '
         '"nombre_maquina": "", '
@@ -49,7 +49,7 @@ def analyze_machine(image_path):
 
     try:
         response = client.chat.completions.create(
-            model="meta-llama/Llama-Vision-Free",  # Cambiado al modelo de visión
+            model="meta-llama/Llama-Vision-Free",  
             messages=[
                 {
                     "role": "user",
