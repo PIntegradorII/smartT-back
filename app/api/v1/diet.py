@@ -151,3 +151,17 @@ async def regenerate_nutrition_plan(google_id: str, db: Session = Depends(get_db
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al regenerar el plan nutricional: {str(e)}")
+@router.delete("/diet-plan/{google_id}", status_code=204)
+async def delete_diet_plan(google_id: str, db: Session = Depends(get_db)):
+    try:
+        # Buscar usuario por google_id
+        user = db.query(User).filter(User.google_id == google_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+        # Eliminar todos los planes del usuario
+        db.query(DietPlan).filter(DietPlan.user_id == user.id).delete()
+        db.commit()
+        return {"message": "Plan nutricional eliminado con éxito"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar el plan nutricional: {str(e)}")
