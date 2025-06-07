@@ -57,8 +57,8 @@ pip y venv para manejar dependencias
     pytest tests/
 
 🐳 Docker (Opcional) - Si quieres correr la aplicación en Docker, ejecuta:
-    docker build -t mi_proyecto_fastapi .
-    docker run -p 8000:8000 mi_proyecto_fastapi
+    docker build -t app .
+    docker run -p 10000:10000 --env-file .env app
 
 
 http://127.0.0.1:8000/docs
